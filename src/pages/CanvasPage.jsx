@@ -304,12 +304,9 @@ const [showProfileDropdown, setShowProfileDropdown] = useState(false);
               <div
                 key={inst.id}
                 className="instance-card"
-                onMouseDown={(e) => handleMouseDown(e, inst.id)}
-                onClick={() => handleCardClick(inst)}
-                style={{
-                  left: positions[inst.id]?.x,
-                  top: positions[inst.id]?.y,
-                }}
+               
+                 onClick={() => handleCardClick(inst)}
+               
               >
                 <div
                   className="star-icon"
