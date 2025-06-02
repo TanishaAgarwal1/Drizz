@@ -10,16 +10,15 @@ const CanvasPage = () => {
   const { name } = useUser();
   const dragItem = useRef(null);
   const offset = useRef({ x: 0, y: 0 });
+  const deviceDropdownRef = useRef(null);
 
   useEffect(() => {
     if (!name) navigate("/auth");
   }, [name, navigate]);
 
-const tUser = JSON.parse(localStorage.getItem("tUser"));
-const initialsSeed = tUser?.name || "User"; 
+  const tUser = JSON.parse(localStorage.getItem("tUser"));
+  const initialsSeed = tUser?.name || "User";
   const [instances, setInstances] = useState(() => {
-
-
     const stored = JSON.parse(localStorage.getItem("instances"));
     if (stored) return stored;
     const initialized = defaultInstances.map((item) => ({
@@ -48,7 +47,7 @@ const initialsSeed = tUser?.name || "User";
   const [filter, setFilter] = useState("all");
   const [deviceDropdownOpen, setDeviceDropdownOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState("All Devices");
-const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   useEffect(() => {
     if (selectedInstance) {
@@ -59,6 +58,19 @@ const [showProfileDropdown, setShowProfileDropdown] = useState(false);
       });
     }
   }, [selectedInstance]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        deviceDropdownRef.current &&
+        !deviceDropdownRef.current.contains(event.target)
+      ) {
+        setDeviceDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleMouseMove = (e) => {
     if (!dragItem.current) return;
@@ -112,6 +124,11 @@ const [showProfileDropdown, setShowProfileDropdown] = useState(false);
       alert("Please request access before collaborating.");
     }
   };
+ const handleRequestClick = (instanceId) => {
+   
+      alert("Request sent for collaborating");
+    
+  };
 
   const toggleStar = (id) => {
     const updatedInstances = instances.map((inst) =>
@@ -144,78 +161,80 @@ const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   };
 
   return (
-    <>
-    
+    <div
+      className="canvas-page"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
+      {selectedInstance && showSidebar && (
+        <div className="sidebar">
+          <button
+            className="close-sidebar-buttn"
+            onClick={() => setShowSidebar(false)}
+          >
+            ×
+          </button>
+          <h2>Testing Details</h2>
+          <h5>Company</h5>
+          <p className="sidebar-input">{formValues.title}</p>
+
+          <h5>Description</h5>
+          <p className="sidebar-text">{formValues.description}</p>
+
+          <select
+            value={formValues.status}
+            onChange={(e) =>
+              setFormValues({ ...formValues, status: e.target.value })
+            }
+          >
+            <option>Status</option>
+            <option>Active</option>
+            <option>Pending</option>
+            <option>Completed</option>
+          </select>
+
+          <p>Collaborators</p>
+          <div className="collaborators-list">
+            {selectedInstance.collaborators &&
+              Object.entries(selectedInstance.collaborators).map(
+                ([email, name], i) => (
+                  <div className="collaborator" key={i} data-name={name}>
+                    <img
+                      src={`https://i.pravatar.cc/30?img=${i + 7}`}
+                      alt={name}
+                      title={`${name} (${email})`}
+                    />
+                  </div>
+                )
+              )}
+          </div>
+
+          <button
+            className="buttn request-buttn"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCollabClick(selectedInstance.id);
+            }}
+          >
+            Collab
+          </button>
+          <button className="buttn enter-buttn"
+          onClick={(e) => {
+              e.stopPropagation();
+              handleRequestClick(selectedInstance.id);
+            }}
+          >Request Access</button>
+        </div>
+      )}
 
       <div
-        className="canvas-page"
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
+        className="main-content"
+        style={{
+          width: selectedInstance && showSidebar ? "calc(100% - 340px)" : "100%",
+        }}
       >
-        
-        {selectedInstance && showSidebar && (
-          <div className="sidebar">
-            <button
-              className="close-sidebar-buttn"
-              onClick={() => setShowSidebar(false)}
-            >
-              ×
-            </button>
-            <h2>Testing Details</h2>
-           <h5>Company</h5>
-<p className="sidebar-input">{formValues.title}</p>
-
-<h5>Description</h5>
-<p className="sidebar-text">{formValues.description}</p>
-
-            <select
-              value={formValues.status}
-              onChange={(e) =>
-                setFormValues({ ...formValues, status: e.target.value })
-              }
-            >
-              <option>Status</option>
-              <option>Active</option>
-              <option>Pending</option>
-              <option>Completed</option>
-            </select>
-            <p>Collaborators</p>
-            <div className="collaborators-list">
-              {selectedInstance.collaborators &&
-                Object.entries(selectedInstance.collaborators).map(
-                  ([email, name], i) => (
-                    <div className="collaborator" key={i} data-name={name}>
-                      <img
-                        src={`https://i.pravatar.cc/30?img=${i + 7}`}
-                        alt={name}
-                        title={`${name} (${email})`}
-                      />
-                    </div>
-                  )
-                )}
-            </div>
-            <button
-              className="buttn request-buttn"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCollabClick(selectedInstance.id);
-              }}
-            >
-              Collab
-            </button>
-            <button className="buttn enter-buttn">Request Access</button>
-          </div>
-        )}
-
-        <div
-          className="main-content"
-          style={{
-            width:
-              selectedInstance && showSidebar ? "calc(100% - 340px)" : "100%",
-          }}
-        >
-          <div className="top-bar">
- <input
+        <div className="top-bar">
+          <input
             type="text"
             className="search-input"
             placeholder="Search by project name or type"
@@ -223,116 +242,111 @@ const [showProfileDropdown, setShowProfileDropdown] = useState(false);
             onChange={(e) => setSearchTerm(e.target.value)}
           />
 
- <div className="profile-dropdown">
-  <img
-  src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(initialsSeed)}&backgroundColor=0D8ABC&fontSize=40`}
-  alt="Profile"
-  className="profile-icon"
-  onClick={() => {
-    setDeviceDropdownOpen(false);
-    setShowProfileDropdown((prev) => !prev);
-  }}
-/>
+          <div className="profile-dropdown">
+            <img
+              src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+                initialsSeed
+              )}&backgroundColor=0D8ABC&fontSize=40`}
+              alt="Profile"
+              className="profile-icon"
+              onClick={() => {
+                setDeviceDropdownOpen(false);
+                setShowProfileDropdown((prev) => !prev);
+              }}
+            />
+            {showProfileDropdown && (
+              <div className="profile-menu">
+                <button onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
 
-  {showProfileDropdown && (
-    <div className="profile-menu">
-      <button onClick={handleLogout}>Logout</button>
-    </div>
-  )}
-</div>
+        <div className="filters">
+          <button
+            onClick={() => setFilter("all")}
+            className={filter === "all" ? "active-filter" : ""}
+          >
+            All Projects
+          </button>
+          <button
+            onClick={() => setFilter("starred")}
+            className={filter === "starred" ? "active-filter" : ""}
+          >
+            Starred
+          </button>
 
-</div>
-
-         
-
-          <div className="filters">
+          <div className="device-filter" ref={deviceDropdownRef}>
             <button
-              onClick={() => setFilter("all")}
-              className={filter === "all" ? "active-filter" : ""}
+              onClick={() => setDeviceDropdownOpen((prev) => !prev)}
+              className="device-dropdown-toggle"
             >
-              All Projects
-            </button>
-            <button
-              onClick={() => setFilter("starred")}
-              className={filter === "starred" ? "active-filter" : ""}
-            >
-              Starred
+              {selectedDevice} <span>{deviceDropdownOpen ? "▲" : "▼"}</span>
             </button>
 
-            <div className="device-filter">
-              <button
-                onClick={() => setDeviceDropdownOpen((prev) => !prev)}
-                className="device-dropdown-toggle"
-              >
-                {selectedDevice} <span>{deviceDropdownOpen ? "▲" : "▼"}</span>
-              </button>
-
-              {deviceDropdownOpen && (
-                <div className="device-dropdown">
+            {deviceDropdownOpen && (
+              <div className="device-dropdown">
+                <div
+                  className={`device-option ${
+                    selectedDevice === "All Devices" ? "selected" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedDevice("All Devices");
+                    setDeviceDropdownOpen(false);
+                  }}
+                >
+                  All Devices
+                </div>
+                {allDeviceNames.map((device) => (
                   <div
+                    key={device}
                     className={`device-option ${
-                      selectedDevice === "All Devices" ? "selected" : ""
+                      selectedDevice === device ? "selected" : ""
                     }`}
                     onClick={() => {
-                      setSelectedDevice("All Devices");
+                      setSelectedDevice(device);
                       setDeviceDropdownOpen(false);
                     }}
                   >
-                    All Devices
+                    {device}
                   </div>
-                  {allDeviceNames.map((device) => (
-                    <div
-                      key={device}
-                      className={`device-option ${
-                        selectedDevice === device ? "selected" : ""
-                      }`}
-                      onClick={() => {
-                        setSelectedDevice(device);
-                        setDeviceDropdownOpen(false);
-                      }}
-                    >
-                      {device}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="instance-list">
-            {filteredInstances.map((inst) => (
-              <div
-                key={inst.id}
-                className="instance-card"
-               
-                 onClick={() => handleCardClick(inst)}
-               
-              >
-                <div
-                  className="star-icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleStar(inst.id);
-                  }}
-                  title="Star this instance"
-                >
-                  {inst.starred ? (
-                    <AiFillStar size={20} color="#f5c518" />
-                  ) : (
-                    <AiOutlineStar size={20} color="#888" />
-                  )}
-                </div>
-
-                <img src={inst.image} alt={inst.title} />
-                <p className="title">
-                  {inst.title} | {inst.device}
-                </p>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
+
+        <div className="instance-list">
+          {filteredInstances.map((inst) => (
+            <div
+              key={inst.id}
+              className="instance-card"
+              onClick={() => handleCardClick(inst)}
+            >
+              <div
+                className="star-icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleStar(inst.id);
+                }}
+                title="Star this instance"
+              >
+                {inst.starred ? (
+                  <AiFillStar size={20} color="#f5c518" />
+                ) : (
+                  <AiOutlineStar size={20} color="#888" />
+                )}
+              </div>
+
+              <img src={inst.image} alt={inst.title} />
+              <p className="title">
+                {inst.title} | {inst.device}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

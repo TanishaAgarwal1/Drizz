@@ -1,11 +1,15 @@
 import instance from './assets/Instance.png';
+import meesho from './assets/Meesho.png';
+import cred from './assets/Cred.png';
+import grow from './assets/Groww.png';
+
 
 export const instances = [
   {
     id: 1,
     title: "Meesho",
     description: "Testing on Meesho with device Samsung Galaxy S24 Android 13.0" ,
-    image: instance,
+    image: meesho,
     collaborators: {"tanisha@gmail.com":"Tanisha","raj@gmail.com":"Raj"},
     device:"Samsung Galaxy S24 Android 13.0",
     starred: false,
@@ -21,9 +25,9 @@ export const instances = [
   },
   {
     id: 3,
-    title: "Zepto",
-    description:  "Testing on Zepto with device Samsung Galaxy S24 Android 14.0 ",
-    image: instance,
+    title: "Groww",
+    description:  "Testing on Groww with device Samsung Galaxy S24 Android 14.0 ",
+    image: grow,
     collaborators: {"tanisha@gmail.com":"Tanisha","raj@gmail.com":"Raj","yash@gmail.com":"Yash"},
     device:"Samsung Galaxy S24 Android 14.0",
     starred: true,
@@ -32,7 +36,7 @@ export const instances = [
     id: 4,
     title: "Cred",
     description: "Testing on Cred with device Samsung Galaxy S24 Android 14.0 ",
-    image: instance,
+    image: cred,
     collaborators: {"raj@gmail.com":"Raj","yash@gmail.com":"Yash"},
     device:"Samsung Galaxy S24 Android 14.0",
     starred: false,
@@ -51,7 +55,7 @@ export const instances = [
     id:6,
     title: "Meesho",
     description: "Testing on Meesho with device Samsung Galaxy S24 Android 13.0" ,
-    image: instance,
+    image: meesho,
     collaborators: {"raj@gmail.com":"Raj","yash@gmail.com":"Yash"},
     device:"Samsung Galaxy S24 Android 13.0",
     starred: true,
@@ -67,9 +71,9 @@ export const instances = [
   },
   {
     id: 8,
-    title: "Zepto",
-    description:  "Testing on Zepto with device Samsung Galaxy S24 Android 14.0 ",
-    image: instance,
+    title: "Groww",
+    description:  "Testing on Groww with device Samsung Galaxy S24 Android 14.0 ",
+    image: grow,
     collaborators:{"raj@gmail.com":"Raj","yash@gmail.com":"Yash"},
     device:"Samsung Galaxy S24 Android 14.0",
     starred: true,
@@ -78,7 +82,7 @@ export const instances = [
     id: 9,
     title: "Cred",
     description: "Testing on Cred with device Samsung Galaxy S24 Android 14.0 ",
-    image: instance,
+    image: cred,
     collaborators:{"raj@gmail.com":"Raj","yash@gmail.com":"Yash"},
     device:"Samsung Galaxy S24 Android 14.0",
     starred: false,
